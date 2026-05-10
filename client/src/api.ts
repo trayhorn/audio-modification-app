@@ -14,14 +14,3 @@ export const uploadAudioReq = async (body: FormData) => {
   const json = await response.json();
   return json;
 }
-
-export const sampleFormUpload = async (body: FormData) => {
-  const res = await fetch(`${URL}/audio/test`, {
-    method: 'POST',
-    body: body, 
-  })
-
-  if(!res.ok) return;
-
-  return await res.json();
-}

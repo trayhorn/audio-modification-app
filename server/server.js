@@ -14,11 +14,6 @@ app.use(
 
 app.use('/audio', audioRouter);
 
-app.use((req, res, next) => {
-  console.log("REQUEST:", req.method, req.url);
-  next();
-});
-
 app.use((_, res) => {
 	res.status(404).json({ message: "Route not found" });
 });
@@ -27,7 +22,6 @@ app.use((err, req, res, next) => {
 	const { status = 500, message = "Server error" } = err;
 	res.status(status).json({ message });
 });
-
 
 
 app.listen(port, () => {

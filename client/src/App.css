@@ -8,3 +8,38 @@
   padding: 20px;
   border-radius: 8px;
 }
+
+.audioMenu {
+  margin-top: 20px;
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.pitchControlsWrapper {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.pitchControlsWrapper .btn {
+  padding: 5px 10px;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+}
+
+.pitchControlsWrapper .btn.modify {
+  background-color: antiquewhite;
+  padding: 5px 15px;
+  width: auto;
+  height: auto;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.pitchControlsWrapper .value {
+  display: inline-block;
+  width: 30px;
+  text-align: center;
+}
