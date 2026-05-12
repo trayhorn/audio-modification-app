@@ -1,6 +1,10 @@
 import { useState } from "react";
 
-export default function PitchControls() {
+type PitchControlsType = {
+  modifyPitch: (pitch: number) => {}
+}
+
+export default function PitchControls({modifyPitch}: PitchControlsType) {
   const [pitch, setPitch] = useState(0);
 
   const handleMinus = () => {
@@ -21,7 +25,7 @@ export default function PitchControls() {
       <button className="btn plus" onClick={handlePlus}>
         +
       </button>
-      <button className="btn modify">Modify</button>
+      <button className="btn modify" onClick={() => modifyPitch(pitch)}>Modify</button>
     </div>
   );
 }

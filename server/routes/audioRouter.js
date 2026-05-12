@@ -4,7 +4,8 @@ const path = require("node:path");
 const multer = require("multer");
 const process = require("node:process");
 const { spawn } = require("node:child_process");
-const crypto = require('node:crypto');
+const crypto = require("node:crypto");
+const FF = require("../lib/FF");
 
 const uploadDir = path.join(process.cwd(), "/tmp");
 
@@ -38,26 +39,32 @@ router.post("/upload", upload.single("audioFile"), async (req, res, next) => {
 
   res.status(200).json({
     message: "Success",
-    audioId
+    audioId,
   });
 });
 
 // Modify pitch route
-router.post("/change_pitch", (req, res, next) => {
-  const { pitch } = req.body;
-  const pitchFactor = Math.pow(2, pitch / 12);
+router.post("/modify_pitch", async (req, res, next) => {
+  try {
+    const { audioId, pitch } = req.body;
+    const pitchFactor = Math.pow(2, pitch / 12);
 
-  spawn("ffmpeg", [
-    "-i",
-    "input.mp3",
-    "-af",
-    "rubberband=pitch=1.05946",
-    "output.mp3",
-  ]);
+    const filename = await fs.readdir(`./storage/${audioId}`);
 
-  res.status(200).json({
-    message: "Success",
-  });
+    let { name, ext } = path.parse(filename[0]);
+    const modifiedName = name + "_output" + ext;
+
+    const inputPath = `./storage/${audioId}/${filename}`;
+    const outputPath = `./storage/${audioId}/${modifiedName}`;
+    await FF.modifyPitch(inputPath, pitchFactor, outputPath);
+
+    res.set('X-File-Name', path.basename(outputPath));
+    res.set('Access-Control-Expose-Headers', 'X-File-Name');
+
+    res.status(200).sendFile(path.join(__dirname, "../", outputPath));
+  } catch (error) {
+    next(error);
+  }
 });
 
 module.exports = router;

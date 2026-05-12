@@ -2,15 +2,27 @@ import { useState, useEffect } from "react";
 import "./App.css";
 import UploadForm from "./components/UploadForm/UploadForm.jsx";
 import AudioMenu from "./components/AudioMenu/AudioMenu.tsx";
-import { uploadAudioReq } from "./api.ts";
+import { uploadAudioReq, modifyPitchReq } from "./api.ts";
+import AudioPlayer from "./components/AudioPlayer/AudioPlayer.tsx";
 
 function App() {
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [audioId, setAudioId] = useState<string>('');
+  const [modifiedFile, setModifiedFile] = useState<File | null>(null);
 
   const handleSetAudioFile = (audioFile: File) => {
     setAudioFile(audioFile);
   };
+
+  const handleModifyPitch = async (pitch: number) => {
+    try {
+      const file = await modifyPitchReq(audioId, pitch);
+      if(!file) throw Error('No file');
+      setModifiedFile(file);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   useEffect(() => {
     const uploadFile = async () => {
@@ -38,7 +50,8 @@ function App() {
       <section>
         <UploadForm handleFormChange={handleSetAudioFile} />
       </section>
-      {audioFile && <AudioMenu file={audioFile} />}
+      {audioFile && <AudioMenu file={audioFile} modifyPitch={handleModifyPitch} />}
+      {modifiedFile && <AudioPlayer file={modifiedFile} />}
     </>
   );
 }
