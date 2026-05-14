@@ -52,9 +52,9 @@ router.post("/modify_pitch", async (req, res, next) => {
     const filename = await fs.readdir(`./storage/${audioId}`);
 
     let { name, ext } = path.parse(filename[0]);
-    const modifiedName = name + "_output" + ext;
+    const modifiedName = name + "_output" + pitch + ext;
 
-    const inputPath = `./storage/${audioId}/${filename}`;
+    const inputPath = `./storage/${audioId}/${filename[0]}`;
     const outputPath = `./storage/${audioId}/${modifiedName}`;
     await FF.modifyPitch(inputPath, pitchFactor, outputPath);
 
@@ -63,6 +63,7 @@ router.post("/modify_pitch", async (req, res, next) => {
 
     res.status(200).sendFile(path.join(__dirname, "../", outputPath));
   } catch (error) {
+    console.log(error);
     next(error);
   }
 });

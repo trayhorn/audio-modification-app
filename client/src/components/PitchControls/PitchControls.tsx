@@ -1,10 +1,11 @@
 import { useState } from "react";
 
 type PitchControlsType = {
-  modifyPitch: (pitch: number) => {}
+  modifyPitch: (pitch: number) => {},
+  reqPending: boolean
 }
 
-export default function PitchControls({modifyPitch}: PitchControlsType) {
+export default function PitchControls({modifyPitch, reqPending}: PitchControlsType) {
   const [pitch, setPitch] = useState(0);
 
   const handleMinus = () => {
@@ -25,7 +26,9 @@ export default function PitchControls({modifyPitch}: PitchControlsType) {
       <button className="btn plus" onClick={handlePlus}>
         +
       </button>
-      <button className="btn modify" onClick={() => modifyPitch(pitch)}>Modify</button>
+      <button className="btn modify" onClick={() => modifyPitch(pitch)} disabled={reqPending}>
+        {reqPending ? 'Processing...' : 'Modify'}
+      </button>
     </div>
   );
 }

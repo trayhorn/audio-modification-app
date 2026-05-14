@@ -31,9 +31,7 @@ export const modifyPitchReq = async (audioId: string, pitch: number) => {
 
   const blob = await response.blob();
   const filename = await response.headers.get('X-File-Name');
-  debugger
-  console.log(filename);
-  console.log(response.headers);
+
   if(!filename) throw Error('No filename in headers');
   const audioFile = new File(
     [blob],

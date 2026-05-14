@@ -1,27 +1,38 @@
-import PitchControls from "../PitchControls/PitchControls";
+import { useEffect, useState } from "react";
 
 type AudioMenuType = {
-  file: File;
-  modifyPitch: (pitch: number) => {}
+  files: File[];
 };
 
-export default function AudioMenu({ file, modifyPitch }: AudioMenuType) {
-  const { name, size } = file;
+export default function AudioMenu({ files }: AudioMenuType) {
+  const [audioSrc, setAudioSrc] = useState<string[]>([]);
+
+  useEffect(() => {
+    const src = files.map((file) => URL.createObjectURL(file));
+    setAudioSrc(src);
+
+    return () => {
+      src.forEach(URL.revokeObjectURL);
+    };
+  }, [files]);
 
   const formatSize = (sizeInBytes: number): string => {
     return `${(sizeInBytes / 1024 / 1024).toFixed(1)} MB`;
   };
 
-  const audioSrc = URL.createObjectURL(file);
-
   return (
-    <section className="audioMenu">
-      <PitchControls modifyPitch={modifyPitch} />
-      <div>
-        <span>{name}</span>
-        <span>{formatSize(size)}</span>
-      </div>
-      <audio controls src={audioSrc}></audio>
-    </section>
+    <>
+      {files.map((f, i) => {
+        return (
+          <section className="audioMenu">
+            <div>
+              <span>{f.name}</span>
+              <span>{formatSize(f.size)}</span>
+            </div>
+            <audio controls src={audioSrc[i]} />
+          </section>
+        );
+      })}
+    </>
   );
 }
