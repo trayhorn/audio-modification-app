@@ -58,7 +58,7 @@ function App() {
       <UploadForm handleFormChange={handleSetAudioFile} />
       {audioFile.length > 0 && <PitchControls modifyPitch={handleModifyPitch} reqPending={isLoading} />}
       {audioFile.length > 0 && <AudioMenu files={audioFile} />}
-      {modifiedFile.length > 0 && <AudioMenu files={modifiedFile} />}
+      {modifiedFile.length > 0 && <AudioMenu files={modifiedFile} isModified={true} />}
     </>
   );
 }

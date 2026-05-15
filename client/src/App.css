@@ -16,6 +16,16 @@
   border-radius: 8px;
 }
 
+.audioMenu > .wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+
 .pitchControlsWrapper {
   display: flex;
   justify-content: center;

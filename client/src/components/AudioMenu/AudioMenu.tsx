@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { MdDownload } from "react-icons/md";
 
 type AudioMenuType = {
   files: File[];
+  isModified?: boolean;
 };
 
-export default function AudioMenu({ files }: AudioMenuType) {
+export default function AudioMenu({ files, isModified }: AudioMenuType) {
   const [audioSrc, setAudioSrc] = useState<string[]>([]);
 
   useEffect(() => {
@@ -24,12 +26,21 @@ export default function AudioMenu({ files }: AudioMenuType) {
     <>
       {files.map((f, i) => {
         return (
-          <section className="audioMenu">
+          <section className="audioMenu" key={i}>
             <div>
               <span>{f.name}</span>
               <span>{formatSize(f.size)}</span>
             </div>
-            <audio controls src={audioSrc[i]} />
+            <div className="wrapper">
+              <audio controls src={audioSrc[i]} />
+              {isModified && (
+                <div className="audioDownload">
+                  <a href={audioSrc[i]} download={f.name}>
+                    <MdDownload size={30} color="black" />
+                  </a>
+                </div>
+              )}
+            </div>
           </section>
         );
       })}
