@@ -57,3 +57,58 @@
   width: 30px;
   text-align: center;
 }
+
+.waveform-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.custom-player {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.tape-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: lightgray;
+  border: none;
+  cursor: pointer;
+}
+
+button[data-playing="true"] .play {
+  display: none;
+}
+
+button[data-playing="false"] .pause {
+  display: none;
+}
+
+.canvas-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100px;
+  background-color: rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+.duration-display {
+  font-family: monospace;
+}
