@@ -47,21 +47,31 @@ router.post("/upload", upload.single("audioFile"), async (req, res, next) => {
 router.post("/modify_pitch", async (req, res, next) => {
   try {
     const { audioId, pitch } = req.body;
-    const pitchFactor = Math.pow(2, pitch / 12);
+    const fileDir = await fs.readdir(`./storage/${audioId}`);
 
-    const filename = await fs.readdir(`./storage/${audioId}`);
+    const origFileName = fileDir[0];
+    const inputPath = `./storage/${audioId}/${origFileName}`;
 
-    let { name, ext } = path.parse(filename[0]);
+    let { dir, name, ext } = path.parse(inputPath);
     const modifiedName = name + "_output" + pitch + ext;
 
-    const inputPath = `./storage/${audioId}/${filename[0]}`;
-    const outputPath = `./storage/${audioId}/${modifiedName}`;
-    await FF.modifyPitch(inputPath, pitchFactor, outputPath);
+    if(fileDir.includes(modifiedName)) {
+      const error = new Error('The file with same pitch already exists');
+      error.status = 400;
+      throw error;
+    }
 
-    res.set('X-File-Name', path.basename(outputPath));
-    res.set('Access-Control-Expose-Headers', 'X-File-Name');
+    const wavFilePath = await FF.convertToWav(inputPath);
+    const modifiedWavPath = await FF.modifyPitch(wavFilePath, pitch);
+    const outputMp3Path = await FF.convertToMp3(modifiedWavPath);
 
-    res.status(200).sendFile(path.join(__dirname, "../", outputPath));
+    await fs.unlink(wavFilePath);
+    await fs.unlink(modifiedWavPath);
+
+    res.set("X-File-Name", path.basename(outputMp3Path));
+    res.set("Access-Control-Expose-Headers", "X-File-Name");
+
+    res.status(200).sendFile(path.join(__dirname, "../", outputMp3Path));
   } catch (error) {
     console.log(error);
     next(error);
