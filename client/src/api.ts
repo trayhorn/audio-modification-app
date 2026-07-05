@@ -3,7 +3,7 @@ const URL = 'http://localhost:3000';
 export const uploadAudioReq = async (body: FormData) => {
   const response = await fetch(`${URL}/audio/upload`, {
     method: 'POST',
-    body
+    body,
   });
 
   if(!response.ok) {

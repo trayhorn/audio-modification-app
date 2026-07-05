@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { FaPlay, FaPause  } from "react-icons/fa";
-
+import { FaPlay, FaPause } from "react-icons/fa";
+import WaveformWorker from "./Worker?worker";
+import Loader from "../Loader/Loader";
 
 interface WaveformPlayerProps {
   file: File;
@@ -12,7 +13,6 @@ interface WaveformBar {
   max: number;
 }
 
-
 export default function WaveformPlayer({ file, fileSrc }: WaveformPlayerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -23,6 +23,7 @@ export default function WaveformPlayer({ file, fileSrc }: WaveformPlayerProps) {
   const gainNodeRef = useRef<GainNode | null>(null);
   const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
 
+  const [isDrawing, setIsDrawing] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(1);
   const [currentTime, setCurrentTime] = useState("0:00");
@@ -44,37 +45,32 @@ export default function WaveformPlayer({ file, fileSrc }: WaveformPlayerProps) {
 
     const samples = audioBuffer.getChannelData(0);
     const barCount = 1000;
-    const samplesPerBar = samples.length / barCount;
-    const data: WaveformBar[] = [];
 
-    for (let i = 0; i < barCount; i++) {
-      const start = Math.floor(i * samplesPerBar);
-      const end = Math.floor(start + samplesPerBar);
-      let min = 0;
-      let max = 0;
-      for (let j = start; j < end; j++) {
-        const val = samples[j];
-        if (val < min) min = Number(val.toFixed(5));
-        if (val > max) max = Number(val.toFixed(5));
+    const worker = new WaveformWorker();
+    worker.postMessage({ samples, barCount }, [samples.buffer]);
+
+    worker.onmessage = (event) => {
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      const data = event.data.data as WaveformBar[];
+
+      const { width, height } = canvas;
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = "purple";
+      const barWidth = width / data.length;
+
+      for (let i = 0; i < data.length; i++) {
+        const { min, max } = data[i];
+        const x = i * barWidth;
+        const yMin = (1 - min) * (height / 2);
+        const yMax = (1 - max) * (height / 2);
+        ctx.fillRect(x, yMax, barWidth, yMin - yMax);
       }
-      data.push({ min, max });
-    }
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const { width, height } = canvas;
-    ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = "purple";
-    const barWidth = width / data.length;
-
-    for (let i = 0; i < data.length; i++) {
-      const { min, max } = data[i];
-      const x = i * barWidth;
-      const yMin = (1 - min) * (height / 2);
-      const yMax = (1 - max) * (height / 2);
-      ctx.fillRect(x, yMax, barWidth, yMin - yMax);
-    }
+      setIsDrawing(false);
+      worker.terminate();
+    };
   }, []);
 
   // ─── Main setup effect — runs when file/fileSrc changes ──────────────────────
@@ -210,7 +206,8 @@ export default function WaveformPlayer({ file, fileSrc }: WaveformPlayerProps) {
 
   return (
     <div className="waveform-wrapper">
-      <div className="custom-player">
+      {isDrawing && <Loader />}
+      <div className="custom-player" style={{ display: isDrawing ? "none" : "flex" }}>
         {/* Controls */}
         <div className="controls">
           <button
@@ -261,5 +258,5 @@ export default function WaveformPlayer({ file, fileSrc }: WaveformPlayerProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { MdDownload } from "react-icons/md";
-import WaveformPlayer from '../Player/Player';
+import WaveformPlayer from "../Player/Player";
 
 type AudioMenuType = {
   files: File[];
@@ -25,15 +25,19 @@ export default function AudioMenu({ files, isModified }: AudioMenuType) {
 
   return (
     <>
-      {files.map((f, i) => {
-        return (
+      {files.map((f, i) =>
           <section className="audioMenu" key={i}>
             <div>
               <span>{f.name}</span>
               <span>{formatSize(f.size)}</span>
             </div>
+
             <div className="wrapper">
-              <WaveformPlayer file={f} fileSrc={audioSrc[i]} />
+              <WaveformPlayer
+                file={f}
+                fileSrc={audioSrc[i]}
+              />
+
               {isModified && (
                 <div className="audioDownload">
                   <a href={audioSrc[i]} download={f.name}>
@@ -43,8 +47,7 @@ export default function AudioMenu({ files, isModified }: AudioMenuType) {
               )}
             </div>
           </section>
-        );
-      })}
+      )}
     </>
   );
 }
