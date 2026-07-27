@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FaPlus, FaMinus  } from "react-icons/fa";
 
 type PitchControlsType = {
   modifyPitch: (pitch: number) => {},
@@ -19,14 +20,14 @@ export default function PitchControls({modifyPitch, reqPending}: PitchControlsTy
   return (
     <div className="pitchControlsWrapper">
       <p>Pitch:</p>
-      <button className="btn minus" onClick={handleMinus}>
-        -
+      <button className="minus" onClick={handleMinus}>
+        <FaMinus style={{display: "block"}} size={20} />
       </button>
       <span className="value">{pitch}</span>
-      <button className="btn plus" onClick={handlePlus}>
-        +
+      <button className="plus" onClick={handlePlus}>
+        <FaPlus style={{display: "block"}} size={20} />
       </button>
-      <button className="btn modify" onClick={() => modifyPitch(pitch)} disabled={reqPending}>
+      <button className="btn-modify" onClick={() => modifyPitch(pitch)} disabled={reqPending || pitch === 0}>
         {reqPending ? 'Processing...' : 'Modify'}
       </button>
     </div>

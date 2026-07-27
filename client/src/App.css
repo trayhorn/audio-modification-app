@@ -36,14 +36,7 @@
   padding: 20px;
 }
 
-.pitchControlsWrapper .btn {
-  padding: 5px 10px;
-  cursor: pointer;
-  width: 30px;
-  height: 30px;
-}
-
-.pitchControlsWrapper .btn.modify {
+.pitchControlsWrapper .btn-modify {
   background-color: antiquewhite;
   padding: 5px 15px;
   width: auto;
