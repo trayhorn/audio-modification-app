@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { FaPlay, FaPause } from "react-icons/fa";
+import { BsSkipBackward } from "react-icons/bs";
+import { MdOutlineReplay10, MdForward10 } from "react-icons/md";
 import WaveformWorker from "./Worker?worker";
 import Loader from "../Loader/Loader";
 
@@ -200,6 +202,14 @@ export default function WaveformPlayer({ file, fileSrc }: WaveformPlayerProps) {
     audio.currentTime = percent * audio.duration;
   };
 
+  // -----------
+
+  const seek = (offsetSeconds: number | "start") => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.currentTime = offsetSeconds === "start" ? 0 : audio.currentTime + offsetSeconds;
+  };
+
   // ─── Render ───────────────────────────────────────────────────────────────────
 
   if (!file || !fileSrc) return null;
@@ -207,24 +217,37 @@ export default function WaveformPlayer({ file, fileSrc }: WaveformPlayerProps) {
   return (
     <div className="waveform-wrapper">
       {isDrawing && <Loader />}
-      <div className="custom-player" style={{ display: isDrawing ? "none" : "flex" }}>
-        {/* Controls */}
+      <div
+        className="custom-player"
+        style={{ display: isDrawing ? "none" : "flex" }}
+      >
+        {/* Controls - potentially a separate component */}
         <div className="controls">
-          <button
-            className="tape-controls"
-            data-playing={isPlaying ? "true" : "false"}
-            role="switch"
-            aria-checked={isPlaying}
-            onClick={handlePlayPause}
-            disabled={!isReady}
-          >
-            {/* Swap these spans for your SVG icons */}
-            {isPlaying ? (
-              <FaPause aria-hidden="false" size={25} />
-            ) : (
-              <FaPlay aria-hidden="true" size={25} />
-            )}
-          </button>
+          <div className="main">
+            <button onClick={() => seek("start")}>
+              <BsSkipBackward style={{ display: "block" }} size={25} />
+            </button>
+            <button onClick={() => seek(-10)}>
+              <MdOutlineReplay10 style={{ display: "block" }} size={30} />
+            </button>
+            <button
+              className="tape-controls"
+              data-playing={isPlaying ? "true" : "false"}
+              role="switch"
+              aria-checked={isPlaying}
+              onClick={handlePlayPause}
+              disabled={!isReady}
+            >
+              {isPlaying ? (
+                <FaPause aria-hidden="false" size={25} />
+              ) : (
+                <FaPlay aria-hidden="true" size={25} />
+              )}
+            </button>
+            <button onClick={() => seek(10)}>
+              <MdForward10 style={{ display: "block" }} size={30} />
+            </button>
+          </div>
 
           <input
             type="range"
@@ -234,6 +257,7 @@ export default function WaveformPlayer({ file, fileSrc }: WaveformPlayerProps) {
             value={volume}
             step={0.01}
             onChange={handleVolumeChange}
+            style={{width: "100%"}}
           />
         </div>
 
@@ -258,5 +282,5 @@ export default function WaveformPlayer({ file, fileSrc }: WaveformPlayerProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

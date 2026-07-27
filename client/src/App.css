@@ -75,8 +75,14 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
+}
+
+.controls .main {
+  display: flex;
+  align-items: center;
+  gap: 10px
 }
 
 .tape-controls {
