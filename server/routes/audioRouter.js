@@ -6,6 +6,7 @@ const process = require("node:process");
 const { spawn } = require("node:child_process");
 const crypto = require("node:crypto");
 const FF = require("../lib/FF");
+const { progressEmitter } = require("../lib/ProgressEmitter");
 
 const uploadDir = path.join(process.cwd(), "/tmp");
 
@@ -23,12 +24,7 @@ const upload = multer({ storage: storage });
 
 const router = express.Router();
 
-// Test route
-router.get("/", (req, res, next) => {
-  res.status(200).json({
-    message: "The route it working correctly",
-  });
-});
+// --- Routing starts here ---
 
 // Upload audio file route
 router.post("/upload", upload.single("audioFile"), async (req, res, next) => {
@@ -55,8 +51,8 @@ router.post("/modify_pitch", async (req, res, next) => {
     let { dir, name, ext } = path.parse(inputPath);
     const modifiedName = name + "_output" + pitch + ext;
 
-    if(fileDir.includes(modifiedName)) {
-      const error = new Error('The file with same pitch already exists');
+    if (fileDir.includes(modifiedName)) {
+      const error = new Error("The file with same pitch already exists");
       error.status = 400;
       throw error;
     }
@@ -72,6 +68,29 @@ router.post("/modify_pitch", async (req, res, next) => {
     res.set("Access-Control-Expose-Headers", "X-File-Name");
 
     res.status(200).sendFile(path.join(__dirname, "../", outputMp3Path));
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
+
+// Get modification progress route
+
+router.get("/progress:jobId", async (req, res, next) => {
+  try {
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
+    res.write(`data: Connected to server\n\n`);
+
+    progressEmitter.on('progressUpdate', (data) => {
+      res.write(`data: ${data}\n\n`);
+    })
+
+    req.on("close", () => {
+      res.end();
+    });
   } catch (error) {
     console.log(error);
     next(error);
