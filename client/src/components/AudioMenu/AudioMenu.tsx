@@ -29,7 +29,7 @@ export default function AudioMenu({ files, isModified }: AudioMenuType) {
           <section className="audioMenu" key={i}>
             <div>
               <span>{f.name}</span>
-              <span>{formatSize(f.size)}</span>
+              <span> {formatSize(f.size)}</span>
             </div>
 
             <div className="wrapper">
