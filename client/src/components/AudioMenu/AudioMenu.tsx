@@ -24,51 +24,26 @@ export default function AudioMenu({ file, isModified }: AudioMenuType) {
   };
 
   return (
-    <>
-      {/* {files.map((f, i) =>
-          <section className="audioMenu" key={i}>
-            <div>
-              <span>{f.name}</span>
-              <span> {formatSize(f.size)}</span>
-            </div>
+    <section className="audioMenu">
+      <div>
+        <span>{file.name}</span>
+        <span> {formatSize(file.size)}</span>
+      </div>
 
-            <div className="wrapper">
-              <WaveformPlayer
-                file={f}
-                fileSrc={audioSrc[i]}
-              />
+      <div className="wrapper">
+        <WaveformPlayer
+          file={file}
+          fileSrc={audioSrc}
+        />
 
-              {isModified && (
-                <div className="audioDownload">
-                  <a href={audioSrc[i]} download={f.name}>
-                    <MdDownload size={30} color="black" />
-                  </a>
-                </div>
-              )}
-            </div>
-          </section>
-      )} */}
-      <section className="audioMenu">
-        <div>
-          <span>{file.name}</span>
-          <span> {formatSize(file.size)}</span>
-        </div>
-
-        <div className="wrapper">
-          <WaveformPlayer
-            file={file}
-            fileSrc={audioSrc}
-          />
-
-          {isModified && (
-            <div className="audioDownload">
-              <a href={audioSrc} download={file.name}>
-                <MdDownload size={30} color="black" />
-              </a>
-            </div>
-          )}
-        </div>
-      </section>
-    </>
+        {isModified && (
+          <div className="audioDownload">
+            <a href={audioSrc} download={file.name}>
+              <MdDownload size={30} color="black" />
+            </a>
+          </div>
+        )}
+      </div>
+    </section>
   );
 }

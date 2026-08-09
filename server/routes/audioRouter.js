@@ -57,9 +57,9 @@ router.post("/modify_pitch", async (req, res, next) => {
       throw error;
     }
 
-    const wavFilePath = await FF.convertToWav(inputPath);
-    const modifiedWavPath = await FF.modifyPitch(wavFilePath, pitch);
-    const outputMp3Path = await FF.convertToMp3(modifiedWavPath);
+    const wavFilePath = await FF.convertToWav(inputPath, audioId);
+    const modifiedWavPath = await FF.modifyPitch(wavFilePath, pitch, audioId);
+    const outputMp3Path = await FF.convertToMp3(modifiedWavPath, audioId);
 
     await fs.unlink(wavFilePath);
     await fs.unlink(modifiedWavPath);
@@ -76,19 +76,22 @@ router.post("/modify_pitch", async (req, res, next) => {
 
 // Get modification progress route
 
-router.get("/progress:jobId", async (req, res, next) => {
+router.get("/progress/:audioId", async (req, res, next) => {
   try {
+    const { audioId } = req.params;
+
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
 
-    res.write(`data: Connected to server\n\n`);
-
-    progressEmitter.on('progressUpdate', (data) => {
+    const progressListener = (data) => {
       res.write(`data: ${data}\n\n`);
-    })
+    }
+
+    progressEmitter.on(`progressUpdate:${audioId}`, progressListener);
 
     req.on("close", () => {
+      progressEmitter.off(`progressUpdate:${audioId}`, progressListener);
       res.end();
     });
   } catch (error) {

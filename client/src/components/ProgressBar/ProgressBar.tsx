@@ -9,13 +9,11 @@ type Progress = {
 type ProgressBarProps = {
   audioId: string;
   audioFile: File;
-}
+};
 
-export default function ProgressBar({
-  audioId,
-  audioFile,
-}: ProgressBarProps) {
+export default function ProgressBar({ audioId, audioFile }: ProgressBarProps) {
   const [progress, setProgress] = useState<Progress | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
   const [totalDurationMs, setTotalDurationMs] = useState<number>(0);
 
   useEffect(() => {
@@ -27,36 +25,45 @@ export default function ProgressBar({
 
     const handleLoadedMetadata = () => {
       setTotalDurationMs(audio.duration * 1_000_000);
-      URL.revokeObjectURL(url);
 
       eventSource = new EventSource(
-        `http://localhost:3000/audio/progress:${audioId}`,
+        `http://localhost:3000/audio/progress/${audioId}`,
       );
 
       eventSource.onmessage = function (event) {
         const data = event.data;
-        const progressData = Object.fromEntries(
-          new URLSearchParams(data.split(",").join("&")),
-        ) as Progress;
-        setProgress(progressData);
 
-        if (progressData.progress === "end") {
+        if (data === "Preparing..." || data === "Finalizing...") {
+          console.log("Setting status:", data);
+          setStatus(data);
+          setProgress(null);
+        } else {
+          const progressData = Object.fromEntries(
+            new URLSearchParams(data.split(",").join("&")),
+          ) as Progress;
+          console.log(progressData);
+          setStatus(null);
+          setProgress(progressData);
+        }
+
+        if (data === "Finished") {
           eventSource?.close();
           setProgress(null);
+          setStatus(null);
         }
       };
 
       eventSource.onerror = function (event) {
         console.log("Error occurred:", event);
       };
-    }
+    };
 
     audio.addEventListener("loadedmetadata", handleLoadedMetadata);
 
     return () => {
       audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
       URL.revokeObjectURL(url);
-      if(eventSource) eventSource.close();
+      if (eventSource) eventSource.close();
     };
   }, [audioId, audioFile]);
 
@@ -66,15 +73,20 @@ export default function ProgressBar({
 
   return (
     <>
-      <div className={styles.container}>
-        <div
-          className={styles.bar}
-          style={{
-            width: `${percentage}%`,
-          }}
-        ></div>
-      </div>
-      <div>Current progress: {Math.ceil(percentage)}%</div>
+      {status && <div>{status}</div>}
+      {progress && (
+        <>
+          <div className={styles.container}>
+            <div
+              className={styles.bar}
+              style={{
+                width: `${percentage}%`,
+              }}
+            ></div>
+          </div>
+          <div>Current progress: {Math.ceil(percentage)}%</div>
+        </>
+      )}
     </>
   );
 }
