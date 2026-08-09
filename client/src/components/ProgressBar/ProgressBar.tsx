@@ -1,14 +1,20 @@
 import styles from "./ProgressBar.module.css";
-import type { Progress } from "../../App.tsx";
 import { useState, useEffect } from "react";
+
+type Progress = {
+  out_time_ms: string;
+  progress: string;
+};
+
+type ProgressBarProps = {
+  audioId: string;
+  audioFile: File;
+}
 
 export default function ProgressBar({
   audioId,
   audioFile,
-}: {
-  audioId: string;
-  audioFile: File | undefined;
-}) {
+}: ProgressBarProps) {
   const [progress, setProgress] = useState<Progress | null>(null);
   const [totalDurationMs, setTotalDurationMs] = useState<number>(0);
 
@@ -31,7 +37,7 @@ export default function ProgressBar({
         const data = event.data;
         const progressData = Object.fromEntries(
           new URLSearchParams(data.split(",").join("&")),
-        );
+        ) as Progress;
         setProgress(progressData);
 
         if (progressData.progress === "end") {

@@ -17,12 +17,13 @@
 }
 
 .audioMenu > .wrapper {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: 1fr 50px;
   margin-top: 10px;
+}
+
+.audioDownload {
+  align-content: center;
 }
 
 
