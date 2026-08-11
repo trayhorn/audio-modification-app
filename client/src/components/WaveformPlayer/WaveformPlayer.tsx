@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { FaPlay, FaPause } from "react-icons/fa";
-import { BsSkipBackward } from "react-icons/bs";
-import { MdOutlineReplay10, MdForward10 } from "react-icons/md";
 import WaveformWorker from "./Worker?worker";
 import Loader from "../Loader/Loader";
+import PlayerControls from "../PlayerControls";
+import PlayerCanvas from "../PlayerCanvas";
+import PlaybackTimer from "../PlaybackTimer";
 
 interface WaveformPlayerProps {
   file: File;
@@ -20,10 +20,10 @@ export default function WaveformPlayer({ file, fileSrc }: WaveformPlayerProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
 
   // Audio refs — never stored in state to avoid re-renders
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const gainNodeRef = useRef<GainNode | null>(null);
-  const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const audioCtxRef = useRef<AudioContext>(null);
+  const gainNodeRef = useRef<GainNode>(null);
+  const sourceNodeRef = useRef<MediaElementAudioSourceNode>(null);
 
   const [isDrawing, setIsDrawing] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -202,14 +202,6 @@ export default function WaveformPlayer({ file, fileSrc }: WaveformPlayerProps) {
     audio.currentTime = percent * audio.duration;
   };
 
-  // -----------
-
-  const seek = (offsetSeconds: number | "start") => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.currentTime = offsetSeconds === "start" ? 0 : audio.currentTime + offsetSeconds;
-  };
-
   // ─── Render ───────────────────────────────────────────────────────────────────
 
   if (!file || !fileSrc) return null;
@@ -221,65 +213,20 @@ export default function WaveformPlayer({ file, fileSrc }: WaveformPlayerProps) {
         className="custom-player"
         style={{ display: isDrawing ? "none" : "flex" }}
       >
-        {/* Controls - potentially a separate component */}
-        <div className="controls">
-          <div className="main">
-            <button onClick={() => seek("start")}>
-              <BsSkipBackward style={{ display: "block" }} size={25} />
-            </button>
-            <button onClick={() => seek(-10)}>
-              <MdOutlineReplay10 style={{ display: "block" }} size={30} />
-            </button>
-            <button
-              className="tape-controls"
-              data-playing={isPlaying ? "true" : "false"}
-              role="switch"
-              aria-checked={isPlaying}
-              onClick={handlePlayPause}
-              disabled={!isReady}
-            >
-              {isPlaying ? (
-                <FaPause aria-hidden="false" size={25} />
-              ) : (
-                <FaPlay aria-hidden="true" size={25} />
-              )}
-            </button>
-            <button onClick={() => seek(10)}>
-              <MdForward10 style={{ display: "block" }} size={30} />
-            </button>
-          </div>
-
-          <input
-            type="range"
-            id="volume"
-            min={0}
-            max={2}
-            value={volume}
-            step={0.01}
-            onChange={handleVolumeChange}
-            style={{width: "100%"}}
-          />
-        </div>
-
-        {/* Waveform canvas */}
-        <div style={{ position: "relative" }}>
-          <canvas
-            ref={canvasRef}
-            id="waveform-main"
-            width={1000}
-            height={100}
-            onClick={handleCanvasClick}
-            style={{ cursor: "pointer", display: "block" }}
-          />
-          <div ref={overlayRef} className="canvas-overlay" />
-        </div>
-
-        {/* Time display */}
-        <div className="duration-display">
-          <span>{currentTime}</span>
-          {" / "}
-          <span>{totalDuration}</span>
-        </div>
+        <PlayerControls
+          isPlaying={isPlaying}
+          isReady={isReady}
+          handlePlayPause={handlePlayPause}
+          volume={volume}
+          handleVolumeChange={handleVolumeChange}
+          audioRef={audioRef}
+        />
+        <PlayerCanvas
+          canvasRef={canvasRef}
+          overlayRef={overlayRef}
+          handleCanvasClick={handleCanvasClick}
+        />
+        <PlaybackTimer currentTime={currentTime} totalDuration={totalDuration} />
       </div>
     </div>
   );

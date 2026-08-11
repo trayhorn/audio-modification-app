@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
-import { MdDownload } from "react-icons/md";
-import WaveformPlayer from "../Player/Player";
+import WaveformPlayer from "../WaveformPlayer/WaveformPlayer";
+import DownloadBtn from "../DownloadBtn";
 
 type AudioMenuType = {
   file: File;
   isModified?: boolean;
+};
+
+const formatSize = (sizeInBytes: number) => {
+  return `${(sizeInBytes / 1024 / 1024).toFixed(1)} MB`;
 };
 
 export default function AudioMenu({ file, isModified }: AudioMenuType) {
@@ -19,10 +23,6 @@ export default function AudioMenu({ file, isModified }: AudioMenuType) {
     };
   }, [file]);
 
-  const formatSize = (sizeInBytes: number): string => {
-    return `${(sizeInBytes / 1024 / 1024).toFixed(1)} MB`;
-  };
-
   return (
     <section className="audioMenu">
       <div>
@@ -31,18 +31,8 @@ export default function AudioMenu({ file, isModified }: AudioMenuType) {
       </div>
 
       <div className="wrapper">
-        <WaveformPlayer
-          file={file}
-          fileSrc={audioSrc}
-        />
-
-        {isModified && (
-          <div className="audioDownload">
-            <a href={audioSrc} download={file.name}>
-              <MdDownload size={30} color="black" />
-            </a>
-          </div>
-        )}
+        <WaveformPlayer file={file} fileSrc={audioSrc} />
+        {isModified && <DownloadBtn audioSrc={audioSrc} filename={file.name} />}
       </div>
     </section>
   );
