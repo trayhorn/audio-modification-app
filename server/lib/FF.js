@@ -32,7 +32,6 @@ const convertToWav = (inputPath, audioId) => {
     });
 
     ffmpeg.stdout.on("data", (data) => {
-      console.log(data);
       progressEmitter.emit(`progressUpdate:${audioId}`, "Preparing...");
     });
   });
@@ -69,7 +68,6 @@ const convertToMp3 = (inputPath, audioId) => {
     });
 
     ffmpeg.stdout.on("data", (data) => {
-      console.log(data.toString("utf-8"));
       if(data.toString("utf-8").includes("progress=end")) {
         progressEmitter.emit(`progressUpdate:${audioId}`, "Finished");
         return;
@@ -111,7 +109,6 @@ const modifyPitch = (inputPath, pitch, audioId) => {
     });
 
     ffmpeg.stdout.on("data", (data) => {
-      console.log(data);
       const filteredArray = data
         .toString("utf-8")
         .split("\n")

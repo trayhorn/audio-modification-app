@@ -89,11 +89,6 @@ export default function WaveformPlayer({ file, fileSrc }: WaveformPlayerProps) {
       prevAudio.onloadedmetadata = null;
       prevAudio.onended = null;
     }
-    // A MediaElementSource is bound 1:1 to its HTMLAudioElement and cannot be
-    // reused, so close the entire AudioContext before creating a new one.
-    if (audioCtxRef.current) {
-      audioCtxRef.current.close();
-    }
 
     setIsPlaying(false);
     setCurrentTime("0:00");

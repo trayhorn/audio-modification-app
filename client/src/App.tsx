@@ -36,6 +36,10 @@ function App() {
   };
 
   useEffect(() => {
+    if(modifiedFile && modifiedFile.length > 0) {
+      setModifiedFile([]);
+    }
+
     const uploadFile = async () => {
       if (!audioFile) return;
 

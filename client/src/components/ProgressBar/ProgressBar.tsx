@@ -41,7 +41,6 @@ export default function ProgressBar({ audioId, audioFile }: ProgressBarProps) {
           const progressData = Object.fromEntries(
             new URLSearchParams(data.split(",").join("&")),
           ) as Progress;
-          console.log(progressData);
           setStatus(null);
           setProgress(progressData);
         }

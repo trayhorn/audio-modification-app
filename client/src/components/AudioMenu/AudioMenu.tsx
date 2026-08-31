@@ -19,6 +19,7 @@ export default function AudioMenu({ file, isModified }: AudioMenuType) {
     setAudioSrc(src);
 
     return () => {
+      setAudioSrc("");
       URL.revokeObjectURL(src);
     };
   }, [file]);
